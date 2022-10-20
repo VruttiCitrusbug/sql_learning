@@ -1,0 +1,100 @@
+1.Fetch playlist by language name
+
+select p.name,l.title from (core_playlist_song INNER join core_playlist as p ON p.id = core_playlist_song.playlist_id)
+inner join (core_song inner join core_language as l ON l.id = core_song.language_id) on core_song.id=core_playlist_song.song_id;
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+2.Fetch playlist by genre and artist id 
+
+select p.name,a.artist_id, s.genre_id from (core_song_artist as a inner join core_song as s ON s.id = a.song_id)
+inner join (core_playlist_song inner join core_playlist as p ON p.id = core_playlist_song.playlist_id) on s.id = core_playlist_song.song_id;
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+3.Fetch Songs And Artists by Genre ID
+
+SELECT s.genre_id,sa.artist_id,s.name from core_song as s inner join core_song_artist as sa ON sa.song_id = s.id;
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+4.Fetch Playlist Detail And Song Details By Artist ID
+
+select ps.playlist_id,ps.song_id,core_song.name as song_name,core_playlist.name as playlist_name,core_artist.name as artist_name ,sa.artist_id from core_playlist_song as ps INNER join core_song_artist as sa on sa.song_id = ps.song_id 
+inner join core_playlist ON core_playlist.id = ps.playlist_id
+inner join core_song ON core_song.id = sa.song_id
+inner join core_artist ON core_artist.id = sa.artist_id;
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+5.Fetch Artist Song Cout and by Artist ID
+
+select count(song_id) as total_song, artist_id from core_song_artist group by artist_id;  
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+7.Fetch Playlist Song Order and Artist Images by Playlist ID
+
+select core_playlist_song.playlist_id,core_artist.image,core_song.order from 
+(core_playlist_song inner join core_song ON core_song.id = core_playlist_song.song_id)
+inner join 
+(core_song_artist inner join core_artist ON core_artist.id = core_song_artist.artist_id)
+on core_song_artist.song_id=core_song.id;
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+10.Fetch Playlist If All Songs in Playlist Are from the same artist
+
+select core_playlist_song.playlist_id
+from core_playlist_song inner join core_song_artist on core_song_artist.song_id=core_playlist_song.song_id
+group by core_playlist_song.playlist_id
+having count(core_song_artist.artist_id)=1;
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+9.Create View For Playlist, Song, and Artist Data.
+
+create view p_a_s as 
+ select core_playlist.name as playlist_name,
+ core_artist.name as artist_name,
+ core_song.name as song_name
+ from 
+ core_playlist_song 
+ inner join core_song on core_song.id = core_playlist_song.song_id
+ inner join core_playlist on core_playlist.id = core_playlist_song.playlist_id
+ inner join core_song_artist on core_song.id=core_song_artist.song_id
+ inner join core_artist ON core_artist.id = core_song_artist.artist_id;
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+ 6.Fetch Artist Data and Song Data by Playlist ID
+
+select ps.playlist_id,ps.song_id ,sa.artist_id,core_artist.name as artist_name,core_song.name as song_name from core_playlist_song as ps 
+INNER join core_song_artist as sa on sa.song_id = ps.song_id
+inner join core_artist ON core_artist.id = sa.artist_id
+INNER join core_song on core_song.id = sa.song_id; 
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+8.Create a bulk query for Insert Playlist.
+INSERT INTO core_playlist (name,user_id,is_featured,share_link)
+values
+('ABC',300,false,current_timestamp),
+('XYZ',300,false,current_timestamp),
+('PQR',300,true,current_timestamp),
+('MNP',300,true,current_timestamp);
+  
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+12.Fetch like for songs by for each playlist
+
+select core_songlike.song_id as Liked_song,core_playlist_song.playlist_id
+from core_songlike inner join core_playlist_song on core_playlist_song.id = core_songlike.song_id;
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+11.Fetch Playlist If All Songs in Playlist Are from the same genre
+
+select core_playlist_song.playlist_id
+from core_playlist_song inner join core_song on core_song.id=core_playlist_song.song_id
+group by core_playlist_song.playlist_id
+having count(core_song.genre_id)=1;
